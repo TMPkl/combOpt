@@ -62,39 +62,32 @@ void Graph::deleteEdge(int edge1, int edge2)
 
 
 void Graph::mergeVertices(int vertex_to_merge, int vertex_to_delete) {
-    // Przenieś wszystkie krawędzie z `vertex_to_delete` do `vertex_to_merge`
     for (int neighbor : adjLists[vertex_to_delete]) {
-        if (neighbor != vertex_to_merge) {  // Unikaj dodawania krawędzi do samego siebie
-            // Dodaj krawędź do vertex_to_merge, jeśli jeszcze nie istnieje
+        if (neighbor != vertex_to_merge) {  
             if (std::find(adjLists[vertex_to_merge].begin(), adjLists[vertex_to_merge].end(), neighbor) == adjLists[vertex_to_merge].end()) {
                 adjLists[vertex_to_merge].push_back(neighbor);
             }
-            // Zaktualizuj listę sąsiedztwa sąsiadów
             for (int &n : adjLists[neighbor]) {
                 if (n == vertex_to_delete) {
-                    n = vertex_to_merge;  // Zastąp `vertex_to_delete` -> `vertex_to_merge`
+                    n = vertex_to_merge;  
                 }
             }
         }
     }
 
-    // Usuń wszystkie krawędzie prowadzące do `vertex_to_delete`
     for (int i = 0; i < numVertices; ++i) {
         adjLists[i].erase(std::remove(adjLists[i].begin(), adjLists[i].end(), vertex_to_delete), adjLists[i].end());
     }
 
-    // Wyczyść listę sąsiedztwa wierzchołka, który został usunięty
     adjLists[vertex_to_delete].clear();
 
-    // Usuń wierzchołek `vertex_to_delete` z listy sąsiedztwa
     adjLists.erase(adjLists.begin() + vertex_to_delete);
     numVertices--;
 
-    // Aktualizacja indeksów pozostałych wierzchołków
     for (int i = 0; i < numVertices; ++i) {
         for (int &neighbor : adjLists[i]) {
             if (neighbor > vertex_to_delete) {
-                neighbor--; // Zmniejszamy indeks sąsiada, jeśli jest większy niż usunięty wierzchołek
+                neighbor--; 
             }
         }
     }

@@ -24,5 +24,5 @@ int main() {
     cout << "Po scaleniu wierzchołków 0 i 2:" << endl;
     g.printGraph();
 
-    return 0;  // Zwolnienie pamięci nastąpi automatycznie przy zakończeniu main()
+    return 0;  
 }
