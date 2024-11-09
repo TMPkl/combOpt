@@ -24,5 +24,10 @@ int main() {
     cout << "Po scaleniu wierzchołków 0 i 2:" << endl;
     g.printGraph();
 
+    cout << "Po usunięciu krawędzi 1 -- 2:" << endl;
+    g.deleteEdge(1, 2);
+    g.printGraph();
+
+
     return 0;  
 }
