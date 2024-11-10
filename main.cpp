@@ -18,16 +18,14 @@ int main() {
     g.addEdge(2, 3);
 
 
+    Graph* j = new Graph(g.number_of_vertices());
+    j->adjLists = g.adjLists;
+    j->deleteEdge(0, 1);
+    j->mergeVertices(0, 2);
+    
+    j->printGraph();
+    cout << endl;
     g.printGraph();
-
-    g.mergeVertices(0, 2);
-    cout << "Po scaleniu wierzchołków 0 i 2:" << endl;
-    g.printGraph();
-
-    cout << "Po usunięciu krawędzi 1 -- 2:" << endl;
-    g.deleteEdge(1, 2);
-    g.printGraph();
-
 
     return 0;  
 }

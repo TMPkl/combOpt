@@ -6,15 +6,17 @@
 class Graph {
 private:
     int numVertices;
-    std::vector<std::vector<int>> adjLists;
-
+    
 public:
+    std::vector<std::vector<int>> adjLists;
     Graph(int vertices);
     ~Graph();  // Deklaracja destruktora
     void addEdge(int src, int dest);
     void printGraph();
     void deleteEdge(int edge1, int edge2);
     void mergeVertices(int vertex1, int vertex2);
+    int number_of_vertices();
+    // int number_of_edges();
 
 };
 
@@ -22,6 +24,21 @@ Graph::Graph(int vertices) {
     numVertices = vertices;
     adjLists.resize(vertices);
 }
+
+int Graph::number_of_vertices()
+{
+    return numVertices;
+}
+// int Graph::number_od_edges()
+// {
+//     int number_of_vertices = 0; 
+//     for(int i = 0; i < numVertices; i++)
+//     {
+//         number_of_vertices += adjLists[i].size();
+//     }
+//     return number_of_vertices;
+// }
+
 
 // Definicja destruktora
 Graph::~Graph() {

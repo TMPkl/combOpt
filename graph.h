@@ -8,7 +8,6 @@
 class Graph {
 private:
     int numVertices; // Liczba wierzchołków
-    std::vector<std::vector<int>> adjLists; // Lista sąsiedztwa
 
 public:
     // Konstruktor
@@ -22,6 +21,10 @@ public:
     void printGraph();                // Wydrukowanie grafu
     void deleteEdge(int edge1, int edge2);
     void mergeVertices(int vertex1, int vertex2);
+    int number_of_vertices();
+    std::vector<std::vector<int>> adjLists; // Lista sąsiedztwa
+
+
 };
 
 #endif // GRAPH_H
