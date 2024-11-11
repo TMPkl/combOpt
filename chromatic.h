@@ -13,18 +13,15 @@ private:
 public:
     Chromatic_polynomial(int deg);
     ~Chromatic_polynomial();
-    
-
-
-
+    void multiply(Chromatic_polynomial &poly);
+    void subtract(Chromatic_polynomial &poly);
+    void print_chromatic();
+    void set_coefficient(int deg, int value);
+    int get_coefficient(int deg);
+    int get_degree();
+    int check_if_possible();
 };
 
-
-
-
-
-
-
-
+Chromatic_polynomial recusive_chromatic_counting(Graph graph);
 
 #endif // chromatic_H

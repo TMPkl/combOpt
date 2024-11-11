@@ -16,6 +16,7 @@ public:
     void deleteEdge(int edge1, int edge2);
     void mergeVertices(int vertex1, int vertex2);
     int number_of_vertices();
+    int number_of_edges();
     // int number_of_edges();
 
 };
@@ -110,4 +111,13 @@ void Graph::mergeVertices(int vertex_to_merge, int vertex_to_delete) {
     }
 
     std::cout << "Vertices " << vertex_to_delete << " and " << vertex_to_merge << " merged and indices updated successfully." << std::endl;
+}
+int Graph::number_of_edges()
+{
+    int number_of_edges = 0; 
+    for(int i = 0; i < numVertices; i++)
+    {
+        number_of_edges += adjLists[i].size();
+    }
+    return number_of_edges/2;
 }

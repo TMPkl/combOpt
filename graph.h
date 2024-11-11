@@ -22,6 +22,7 @@ public:
     void deleteEdge(int edge1, int edge2);
     void mergeVertices(int vertex1, int vertex2);
     int number_of_vertices();
+    int number_of_edges();
     std::vector<std::vector<int>> adjLists; // Lista sąsiedztwa
 
 
