@@ -31,12 +31,20 @@ Chromatic_polynomial::~Chromatic_polynomial() {
 
 void Chromatic_polynomial::multiply(Chromatic_polynomial &poly) {
     int new_degree = degree + poly.get_degree();
+    if (new_degree < 0) {
+        std::cerr << "Error: Invalid polynomial degree during multiplication." << std::endl;
+        return;
+    }
+
     std::vector<int> new_coefficients(new_degree + 1, 0);
     for (int i = 0; i <= degree; ++i) {
         for (int j = 0; j <= poly.get_degree(); ++j) {
-            new_coefficients[i + j] += coefficients[i] * poly.get_coefficient(j);
+            if (i + j <= new_degree) {
+                new_coefficients[i + j] += coefficients[i] * poly.get_coefficient(j);
+            }
         }
     }
+
     degree = new_degree;
     coefficients = new_coefficients;
 }
@@ -46,27 +54,42 @@ int Chromatic_polynomial::get_degree() {
 int Chromatic_polynomial::get_coefficient(int deg) {
     if (deg >= 0 && deg <= degree) {
         return coefficients[deg];
+    } else if (deg > degree) {
+        return 0;
     } else {
         std::cerr << "Error: Coefficient index out of bounds." << std::endl;
         return 0;
     }
 }
 void Chromatic_polynomial::set_coefficient(int deg, int value) {
-    if (deg >= 0 && deg <= degree) {
-        coefficients[deg] = value;
-    } else {
-        std::cerr << "Error: Coefficient index out of bounds." << std::endl;
+    if (deg < 0) {
+        std::cerr << "Error: Coefficient index out of bounds (negative)." << std::endl;
+        return;
     }
+    if (deg > degree) {
+        coefficients.resize(deg + 1, 0);
+        degree = deg;
+    }
+    coefficients[deg] = value;
 }
+
 void Chromatic_polynomial::subtract(Chromatic_polynomial &poly) {
     int new_degree = std::max(degree, poly.get_degree());
+    
+    // Resize if necessary to avoid out-of-bounds access
+    if (degree < new_degree) {
+        coefficients.resize(new_degree + 1, 0);
+        degree = new_degree;
+    }
+    
     std::vector<int> new_coefficients(new_degree + 1, 0);
     for (int i = 0; i <= new_degree; ++i) {
         new_coefficients[i] = get_coefficient(i) - poly.get_coefficient(i);
     }
-    degree = new_degree;
     coefficients = new_coefficients;
 }
+
+
 void Chromatic_polynomial::print_chromatic() {
     for (int i = degree; i >= 0; --i) {
             if (i == 0) {
@@ -84,21 +107,25 @@ int Chromatic_polynomial::check_if_possible() {
 } 
 
 Chromatic_polynomial recusive_chromatic_counting(Graph graph){
-
-    if(graph.number_of_vertices() == 1)
-    {   Chromatic_polynomial res(2);
-        res.set_coefficient(1,1); // dla x^1 współczynnik 1
-        res.set_coefficient(0,0);   // dla wyrazu wolnego współczynnik 0
+if (graph.number_of_vertices() == 2 && graph.number_of_edges() == 1) {
+        Chromatic_polynomial res(2);
+        res.set_coefficient(2, 1); // Coefficient for x^2
+        res.set_coefficient(1, -1); // Coefficient for x^1
+        res.set_coefficient(0, 0); // Constant term
         return res;
     }
-    if (graph.number_of_edges() == 0)
-    {
-        Chromatic_polynomial res(graph.number_of_vertices());
-        res.set_coefficient(graph.number_of_vertices(),1);
-        for(int i = 0; i<graph.number_of_vertices();i++)
-        {
-            res.set_coefficient(i,0);
+if (graph.number_of_vertices() == 1) {
+        Chromatic_polynomial res(1);
+        res.set_coefficient(1, 1); // Coefficient for x^1
+        res.set_coefficient(0, 0); // Constant term
+        return res;
+    }
 
+    if (graph.number_of_edges() == 0) {
+        Chromatic_polynomial res(graph.number_of_vertices());
+        res.set_coefficient(graph.number_of_vertices(), 1);
+        for (int i = 0; i < graph.number_of_vertices(); i++) {
+            res.set_coefficient(i, 0);
         }
         return res;
     }
@@ -115,21 +142,30 @@ Chromatic_polynomial recusive_chromatic_counting(Graph graph){
         for(int i = 0; i<graph.number_of_vertices()-1;i++)
         {   
             res.multiply(multiplyer);
-            
+        
         }
 
         return res;
     }
-    
-    else
-        {
-            //std::cerr << "Error: Graph has edges, recursive counting not implemented." << std::endl;
-            //exit(EXIT_FAILURE);
 
-            return Chromatic_polynomial(0);
-        
-        
-        
-        }
+    Graph *deleted_edge = new Graph(graph.number_of_vertices());
+    deleted_edge->adjLists = graph.adjLists;
+    deleted_edge->deleteEdge(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
+
+    Graph *merged_vertices = new Graph(graph.number_of_vertices());
+    merged_vertices->adjLists = graph.adjLists;
+    merged_vertices->mergeVertices(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
+
+    // Recursive calls
+    Chromatic_polynomial res1 = recusive_chromatic_counting(*deleted_edge);
+    Chromatic_polynomial res2 = recusive_chromatic_counting(*merged_vertices);
+
+    res1.subtract(res2);
+
+    // Cleanup to avoid memory leaks
+    delete deleted_edge;
+    delete merged_vertices;
+
+    return res1;
         
     }
