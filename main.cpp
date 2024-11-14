@@ -13,7 +13,7 @@ int main() {
     g.addEdge(4, 2);
     g.addEdge(2, 3);
     g.addEdge(2, 1);
-
+    //for this data the answe should be 1x^5 + -5x^4 + 9x^3 + -7x^2 + 2x + 0
     
     // a.set_coefficient(1, 1);
     // a.set_coefficient(0, -1);
@@ -27,6 +27,13 @@ int main() {
     
     Chromatic_polynomial poly = recusive_chromatic_counting(g);
     poly.print_chromatic();
+   unsigned long long int i = 1;
+    while (i<1000){
+
+    cout <<"for "<<i<<" colors there are :" <<poly.count_number_of_colorings(i)<<" posible ways to lagaly colour" << endl;
+    i++;
+    }
+    
     // g.addEdge(2, 5);
     // g.addEdge(2, 4);
     // g.addEdge(2, 3);

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <cmath>
 #include "graph.h"
 
 
@@ -19,7 +20,16 @@ public:
     int get_coefficient(int deg);
     int get_degree();
     int check_if_possible();
+    unsigned long long int count_number_of_colorings(long long unsigned int number_of_colors);
 };
+unsigned long long int  Chromatic_polynomial::count_number_of_colorings(unsigned long long int number_of_colors) {
+    long long int result = 0;
+    for(int i = 0; i<=degree;i++)
+    {
+        result += coefficients[i]*pow(number_of_colors,i); //liczymy wartość wielomianu dla liczby kolorów - metoda hornera Ean wing wing
+    }
+    return result;
+}
 
 Chromatic_polynomial::Chromatic_polynomial(int deg) {
     degree = deg;

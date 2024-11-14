@@ -20,6 +20,7 @@ public:
     int get_coefficient(int deg);
     int get_degree();
     int check_if_possible();
+    unsigned long long int  count_number_of_colorings(unsigned long long int  number_of_colors);
 };
 
 Chromatic_polynomial recusive_chromatic_counting(Graph graph);
