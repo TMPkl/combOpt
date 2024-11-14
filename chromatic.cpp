@@ -109,15 +109,15 @@ int Chromatic_polynomial::check_if_possible() {
 Chromatic_polynomial recusive_chromatic_counting(Graph graph){
 if (graph.number_of_vertices() == 2 && graph.number_of_edges() == 1) {
         Chromatic_polynomial res(2);
-        res.set_coefficient(2, 1); // Coefficient for x^2
-        res.set_coefficient(1, -1); // Coefficient for x^1
-        res.set_coefficient(0, 0); // Constant term
+        res.set_coefficient(2, 1); 
+        res.set_coefficient(1, -1); 
+        res.set_coefficient(0, 0); 
         return res;
     }
 if (graph.number_of_vertices() == 1) {
         Chromatic_polynomial res(1);
-        res.set_coefficient(1, 1); // Coefficient for x^1
-        res.set_coefficient(0, 0); // Constant term
+        res.set_coefficient(1, 1); 
+        res.set_coefficient(0, 0); 
         return res;
     }
 
@@ -129,7 +129,7 @@ if (graph.number_of_vertices() == 1) {
         }
         return res;
     }
-    if (graph.is_tree())  
+    if (graph.is_tree())  //znacznie przyspiesza obliczenia
     {
         std::cout << "Chomatic:: The graph is a tree." << std::endl;
         Chromatic_polynomial res(1);
@@ -156,13 +156,12 @@ if (graph.number_of_vertices() == 1) {
     merged_vertices->adjLists = graph.adjLists;
     merged_vertices->mergeVertices(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
 
-    // Recursive calls
     Chromatic_polynomial res1 = recusive_chromatic_counting(*deleted_edge);
     Chromatic_polynomial res2 = recusive_chromatic_counting(*merged_vertices);
 
     res1.subtract(res2);
 
-    // Cleanup to avoid memory leaks
+
     delete deleted_edge;
     delete merged_vertices;
 
