@@ -23,8 +23,9 @@ public:
     void mergeVertices(int vertex1, int vertex2);
     int number_of_vertices();
     int number_of_edges();
+    int find_max_degree_vertice();
     std::vector<std::vector<int>> adjLists; // Lista sąsiedztwa
-
+    bool is_tree();
 
 };
 

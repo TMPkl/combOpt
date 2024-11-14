@@ -69,15 +69,13 @@ void Chromatic_polynomial::subtract(Chromatic_polynomial &poly) {
 }
 void Chromatic_polynomial::print_chromatic() {
     for (int i = degree; i >= 0; --i) {
-        if (coefficients[i] != 0) {
             if (i == 0) {
-                std::cout << coefficients[i];
+                std::cout << coefficients[i] << std::endl;
             } else if (i == 1) {
                 std::cout << coefficients[i] << "x + ";
             } else {
                 std::cout << coefficients[i] << "x^" << i << " + ";
             }
-        }
     }
     std::cout << std::endl;
 }
@@ -88,8 +86,9 @@ int Chromatic_polynomial::check_if_possible() {
 Chromatic_polynomial recusive_chromatic_counting(Graph graph){
 
     if(graph.number_of_vertices() == 1)
-    {   Chromatic_polynomial res(1);
-        res.set_coefficient(0,1);
+    {   Chromatic_polynomial res(2);
+        res.set_coefficient(1,1); // dla x^1 współczynnik 1
+        res.set_coefficient(0,0);   // dla wyrazu wolnego współczynnik 0
         return res;
     }
     if (graph.number_of_edges() == 0)
@@ -103,6 +102,34 @@ Chromatic_polynomial recusive_chromatic_counting(Graph graph){
         }
         return res;
     }
+    if (graph.is_tree())  
+    {
+        std::cout << "Chomatic:: The graph is a tree." << std::endl;
+        Chromatic_polynomial res(1);
+        Chromatic_polynomial multiplyer(1);
+        res.set_coefficient(1,1);
+        res.set_coefficient(0,0);  
+        multiplyer.set_coefficient(1,1);
+        multiplyer.set_coefficient(0,-1);
+        std::cout<< graph.number_of_vertices() << std::endl;
+        for(int i = 0; i<graph.number_of_vertices()-1;i++)
+        {   
+            res.multiply(multiplyer);
+            
+        }
+
+        return res;
+    }
+    
     else
-        std::cerr << "Error: Graph has edges, recursive counting not implemented." << std::endl;
-        exit(EXIT_FAILURE);}
+        {
+            //std::cerr << "Error: Graph has edges, recursive counting not implemented." << std::endl;
+            //exit(EXIT_FAILURE);
+
+            return Chromatic_polynomial(0);
+        
+        
+        
+        }
+        
+    }

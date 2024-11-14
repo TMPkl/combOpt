@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>
+#include <functional>
 
 class Graph {
 private:
@@ -17,6 +18,9 @@ public:
     void mergeVertices(int vertex1, int vertex2);
     int number_of_vertices();
     int number_of_edges();
+    int find_max_degree_vertice();
+    bool is_tree();
+
     // int number_of_edges();
 
 };
@@ -121,3 +125,59 @@ int Graph::number_of_edges()
     }
     return number_of_edges/2;
 }
+
+int Graph::find_max_degree_vertice(){
+    int max_degree = 0;
+    int vertice = 0;
+    for(int i = 0; i < numVertices; i++)
+    {
+        if(adjLists[i].size() > max_degree)
+        {
+            max_degree = adjLists[i].size();
+            vertice = i;
+        }
+    }
+    return vertice;
+}
+
+bool Graph::is_tree() {
+    if (number_of_edges() != numVertices - 1) {
+        return false;
+    }
+
+    std::vector<bool> visited(numVertices, false);
+
+    // Helper function for DFS
+    std::function<bool(int, int)> dfs = [&](int vertex, int parent) {
+        visited[vertex] = true;
+        for (int neighbor : adjLists[vertex]) {
+            if (!visited[neighbor]) {
+                if (!dfs(neighbor, vertex)) {
+                    return false;  // Found a cycle
+                }
+            } else if (neighbor != parent) {
+                return false;  // Cycle detected
+            }
+        }
+        return true;
+    };
+
+    // Check for cycle and connectivity from vertex 0
+    if (!dfs(0, -1)) {
+        return false;
+    }
+
+    // Check if all vertices were visited (graph is connected)
+    for (bool v : visited) {
+        if (!v) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+
+
+

@@ -7,13 +7,29 @@ using namespace std;
 
 
 int main() {
-    // Graph g(6);
+    Graph g(3);
+    g.addEdge(1, 0);
+    g.addEdge(1, 2);
 
-    // g.addEdge(0, 1);
-    // g.addEdge(1, 3);
-    // g.addEdge(0, 2);
-    // g.addEdge(0, 4);
+    Chromatic_polynomial a(2);
+    Chromatic_polynomial b(1);
 
+    // a.set_coefficient(1, 1);
+    // a.set_coefficient(0, -1);
+
+    // b.set_coefficient(1, 1);
+    // b.set_coefficient(0, 0);
+
+    // a.multiply(b);
+    // a.print_chromatic();
+
+    if (g.is_tree()) {
+        std::cout << "The graph is a tree." << std::endl;
+    } else {
+        std::cout << "The graph is not a tree." << std::endl;
+    }
+    Chromatic_polynomial poly = recusive_chromatic_counting(g);
+    poly.print_chromatic();
     // g.addEdge(2, 5);
     // g.addEdge(2, 4);
     // g.addEdge(2, 3);
