@@ -7,12 +7,25 @@ using namespace std;
 
 
 int main() {
-    Graph g(5);
+    Graph g(10);
     g.addEdge(0, 2);
     g.addEdge(0, 4);
-    g.addEdge(4, 2);
-    g.addEdge(2, 3);
-    g.addEdge(2, 1);
+    g.addEdge(0, 5);
+    g.addEdge(1, 2);
+    g.addEdge(1, 3);
+
+    g.addEdge(8, 9);
+    g.addEdge(8, 7);
+    g.addEdge(8, 6);
+    g.addEdge(7, 8);
+    g.addEdge(7, 6);
+    g.addEdge(6, 9);
+
+    auto sg =  g.extract_neighboring_subgraph(0);
+    sg->printGraph();
+    cout << endl;
+    g.printGraph();
+
     //for this data the answe should be 1x^5 + -5x^4 + 9x^3 + -7x^2 + 2x + 0
     
     // a.set_coefficient(1, 1);
@@ -25,15 +38,15 @@ int main() {
     // a.print_chromatic();
 
     
-    Chromatic_polynomial poly = recusive_chromatic_counting(g);
-    poly.print_chromatic();
-   unsigned long long int i = 1;
-    while (i<1000){
+    //     Chromatic_polynomial poly = recusive_chromatic_counting(g);
+    //     poly.print_chromatic();
+    // unsigned long long int i = 1;
+    //     while (i<1000){
 
-    cout <<"for "<<i<<" colors there are :" <<poly.count_number_of_colorings(i)<<" posible ways to lagaly colour" << endl;
-    i++;
-    }
-    
+    //     cout <<"for "<<i<<" colors there are :" <<poly.count_number_of_colorings(i)<<" posible ways to lagaly colour" << endl;
+    //     i++;
+    //     }
+        
     // g.addEdge(2, 5);
     // g.addEdge(2, 4);
     // g.addEdge(2, 3);

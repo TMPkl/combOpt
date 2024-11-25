@@ -26,6 +26,9 @@ public:
     int find_max_degree_vertice();
     std::vector<std::vector<int>> adjLists; // Lista sąsiedztwa
     bool is_tree();
+    Graph* extract_neighboring_subgraph(int vertex);
+    std::vector<int> DFS();
+
 
 };
 

@@ -3,6 +3,7 @@
 #include <list>
 #include <algorithm>
 #include <functional>
+#include <queue>
 
 class Graph {
 private:
@@ -20,15 +21,16 @@ public:
     int number_of_edges();
     int find_max_degree_vertice();
     bool is_tree();
-
-    // int number_of_edges();
-
+    Graph* extract_neighboring_subgraph(int vertex);
+    std::vector<int> DFS();
 };
 
 Graph::Graph(int vertices) {
     numVertices = vertices;
     adjLists.resize(vertices);
 }
+
+
 
 int Graph::number_of_vertices()
 {
@@ -138,6 +140,76 @@ int Graph::find_max_degree_vertice(){
         }
     }
     return vertice;
+}
+
+
+Graph* Graph::extract_neighboring_subgraph(int vertex) {
+    if (vertex < 0 || vertex >= numVertices) {
+        std::cerr << "Invalid vertex index." << std::endl;
+        return nullptr;
+    }
+
+    std::vector<bool> visited(numVertices, false);
+    std::queue<int> q;
+    q.push(vertex);
+    visited[vertex] = true;
+
+    std::vector<int> component;
+    while (!q.empty()) {
+        int current = q.front();
+        q.pop();
+        component.push_back(current);
+
+        for (int neighbor : adjLists[current]) {
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                q.push(neighbor);
+            }
+        }
+    }
+
+    // Identify vertices to keep (not part of the component containing 'vertex')
+    std::vector<int> vertices_to_keep;
+    for (int i = 0; i < numVertices; ++i) {
+        if (!visited[i]) {
+            vertices_to_keep.push_back(i);
+        }
+    }
+
+    // Create the new graph with remapped vertices
+    Graph* new_graph = new Graph(vertices_to_keep.size());
+    std::unordered_map<int, int> vertex_map; // Map old to new indices
+    for (int i = 0; i < vertices_to_keep.size(); ++i) {
+        vertex_map[vertices_to_keep[i]] = i;
+    }
+
+    for (int old_vertex : vertices_to_keep) {
+        for (int neighbor : adjLists[old_vertex]) {
+            if (vertex_map.find(neighbor) != vertex_map.end()) {
+                new_graph->addEdge(vertex_map[old_vertex], vertex_map[neighbor]);
+            }
+        }
+    }
+
+    return new_graph;
+}
+
+std::vector<int> Graph::DFS()
+{
+    std::vector<int> visited;
+    std::vector<int> stack;
+    stack.push_back(0);
+    while(stack.size() > 0)
+    {
+        int current = stack.back();
+        stack.pop_back();
+        visited.push_back(current);
+        for(int i = 0; i < adjLists[current].size(); i++)
+        {
+            stack.push_back(adjLists[current][i]);
+        }
+    }
+    return visited;
 }
 
 bool Graph::is_tree() {
