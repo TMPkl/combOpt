@@ -117,6 +117,12 @@ int Chromatic_polynomial::check_if_possible() {
 } 
 
 Chromatic_polynomial recusive_chromatic_counting(Graph graph){
+if(graph.number_of_edges() == 0 && graph.number_of_vertices() == 0)
+{
+    Chromatic_polynomial res(0);
+    res.set_coefficient(0,1);
+    return res;
+}
 if (graph.number_of_vertices() == 2 && graph.number_of_edges() == 1) {
         Chromatic_polynomial res(2);
         res.set_coefficient(2, 1); 
@@ -166,15 +172,32 @@ if (graph.number_of_vertices() == 1) {
     merged_vertices->adjLists = graph.adjLists;
     merged_vertices->mergeVertices(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
 
-    Chromatic_polynomial res1 = recusive_chromatic_counting(*deleted_edge);
-    Chromatic_polynomial res2 = recusive_chromatic_counting(*merged_vertices);
 
-    res1.subtract(res2);
+    auto unconnected_de =deleted_edge->extract_neighboring_subgraph(graph.find_max_degree_vertice());
+    auto unconnected_mv =merged_vertices->extract_neighboring_subgraph(graph.find_max_degree_vertice());
+    auto main_de = recusive_chromatic_counting(*deleted_edge);
+    auto main_mv = recusive_chromatic_counting(*merged_vertices);
+    auto unconnected_de_res = recusive_chromatic_counting(*unconnected_de);
+    auto unconnected_mv_res = recusive_chromatic_counting(*unconnected_mv);
 
 
-    delete deleted_edge;
-    delete merged_vertices;
+    main_de.multiply(unconnected_de_res);
+    main_mv.multiply(unconnected_mv_res);
 
-    return res1;
-        
+    main_de.subtract(main_mv);
+
+    return main_de;
+
+
+    //Chromatic_polynomial res1 = recusive_chromatic_counting(*deleted_edge);
+    //Chromatic_polynomial res2 = recusive_chromatic_counting(*merged_vertices);
+
+    //res1.subtract(res2);
+
+
+    //delete deleted_edge;
+  //  delete merged_vertices;
+   
+//    return res1;
+       
     }

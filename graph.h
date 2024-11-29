@@ -28,6 +28,7 @@ public:
     bool is_tree();
     Graph* extract_neighboring_subgraph(int vertex);
     std::vector<int> DFS();
+    bool is_edge(int src, int dest);
 
 
 };

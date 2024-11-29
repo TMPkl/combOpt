@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <queue>
+#include <unordered_set>
 
 class Graph {
 private:
@@ -21,6 +22,7 @@ public:
     int number_of_edges();
     int find_max_degree_vertice();
     bool is_tree();
+    bool is_edge(int src, int dest);
     Graph* extract_neighboring_subgraph(int vertex);
     std::vector<int> DFS();
 };
@@ -60,6 +62,21 @@ void Graph::addEdge(int src, int dest) {
         adjLists[dest].push_back(src);
     } else {
         std::cerr << "Error: Vertex index out of bounds." << std::endl;
+    }
+}
+bool Graph::is_edge(int src, int dest) {
+    if (src >= 0 && src < numVertices && dest >= 0 && dest < numVertices) {
+        for (auto it = adjLists[src].begin(); it != adjLists[src].end(); ++it) {
+            if (*it == dest) {
+                std::cerr << "Edge " << src << " -- " << dest << " exists." << std::endl;
+                return 1;
+            }
+        }
+        std::cerr << "Edge " << src << " -- " << dest << " does not exist." << std::endl;
+        return 0;
+    } else {
+        std::cerr << "Error: Vertex index out of bounds." << std::endl;
+        return 0;
     }
 }
 
@@ -184,13 +201,24 @@ Graph* Graph::extract_neighboring_subgraph(int vertex) {
     }
 
     for (int old_vertex : vertices_to_keep) {
+        std::unordered_set<int> added_edges; // To avoid duplicates
         for (int neighbor : adjLists[old_vertex]) {
-            if (vertex_map.find(neighbor) != vertex_map.end()) {
+            if (vertex_map.find(neighbor) != vertex_map.end() && added_edges.find(neighbor) == added_edges.end()) {
+                if(old_vertex > neighbor || new_graph->is_edge(vertex_map[neighbor], vertex_map[old_vertex]))
+                {
+                    continue;
+                }
                 new_graph->addEdge(vertex_map[old_vertex], vertex_map[neighbor]);
+                added_edges.insert(neighbor);
             }
         }
     }
 
+    if(new_graph->adjLists.size() == 0)
+    {
+        Graph* empty_graph = new Graph(0);
+        return empty_graph;
+    }
     return new_graph;
 }
 
