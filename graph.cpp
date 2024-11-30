@@ -139,6 +139,9 @@ void Graph::mergeVertices(int vertex_to_merge, int vertex_to_delete) {
             }
         }
     }
+    this->adjLists.resize(this->adjLists.size()-1);
+    this->adjLists.shrink_to_fit();
+    this->numVertices = this->adjLists.size();
 
     std::cout << "Vertices " << vertex_to_delete << " and " << vertex_to_merge << " merged and indices updated successfully." << std::endl;
 }
@@ -155,6 +158,12 @@ int Graph::number_of_edges()
 int Graph::find_max_degree_vertice(){
     int max_degree = 0;
     int vertice = 0;
+    if(numVertices == 0)
+    {
+        std::cerr << "Error: Graph is empty." << std::endl;
+        
+        return -1;
+    }
     for(int i = 0; i < numVertices; i++)
     {
         if(adjLists[i].size() > max_degree)

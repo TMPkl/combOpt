@@ -165,23 +165,22 @@ if (graph.number_of_vertices() == 1) {
     }
 
 
-    Graph *unconnected = graph.extract_neighboring_subgraph(graph.find_max_degree_vertice());
-
+    Graph *unconnected = graph.extract_neighboring_subgraph(0);
+    Chromatic_polynomial unconected_poly = recusive_chromatic_counting(*unconnected);
+    delete unconnected;
     /////tutaj sie nadal naprawia nie ruszac tego  
-
-
+    
     Graph *deleted_edge = new Graph(graph.number_of_vertices());
     deleted_edge->adjLists = graph.adjLists;
-    deleted_edge->deleteEdge(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
+    deleted_edge->deleteEdge(deleted_edge->find_max_degree_vertice(), deleted_edge->adjLists[deleted_edge->find_max_degree_vertice()][0]);
 
     Graph *merged_vertices = new Graph(graph.number_of_vertices());
     merged_vertices->adjLists = graph.adjLists;
-    merged_vertices->mergeVertices(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
+    merged_vertices->mergeVertices(merged_vertices->find_max_degree_vertice(),merged_vertices->adjLists[merged_vertices->find_max_degree_vertice()][0]);
 
     auto main_de = recusive_chromatic_counting(*deleted_edge);
     auto main_mv = recusive_chromatic_counting(*merged_vertices);
 
-    Chromatic_polynomial unconected_poly = recusive_chromatic_counting(*unconnected);
 
     main_de.subtract(main_mv);
     main_de.multiply(unconected_poly);
