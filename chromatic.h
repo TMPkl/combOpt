@@ -6,6 +6,9 @@
 #include <list>
 #include "graph.h"
 
+
+
+
 class Chromatic_polynomial {
 private:
     int degree;

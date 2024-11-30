@@ -8,9 +8,9 @@
 
 class Graph {
 private:
-    int numVertices;
     
 public:
+    int numVertices;
     std::vector<std::vector<int>> adjLists;
     Graph(int vertices);
     ~Graph();  // Deklaracja destruktora
@@ -30,6 +30,7 @@ public:
 Graph::Graph(int vertices) {
     numVertices = vertices;
     adjLists.resize(vertices);
+    adjLists.shrink_to_fit();  
 }
 
 
@@ -81,6 +82,7 @@ bool Graph::is_edge(int src, int dest) {
 }
 
 void Graph::printGraph() {
+   // std::cout << "debugigng seg fault" << std::endl;
     for (int i = 0; i < numVertices; ++i) {
 
         for (auto it = adjLists[i].begin(); it != adjLists[i].end(); ++it) {
@@ -89,17 +91,22 @@ void Graph::printGraph() {
             }
         }
     }
+    //std::cout << "debugigng seg fault, uff it is not here" << std::endl;
+
 }
 void Graph::deleteEdge(int edge1, int edge2)
 {
-    for (auto it = adjLists[edge1].begin(); it != adjLists[edge1].end(); ++it) {
-        if (*it == edge2) {
-            adjLists[edge1].erase(it);
-            adjLists[edge2].erase(std::find(adjLists[edge2].begin(), adjLists[edge2].end(), edge1));
-            break;
-        }
+    auto it1 = std::find(adjLists[edge1].begin(), adjLists[edge1].end(), edge2);
+    if (it1 != adjLists[edge1].end()) {
+        adjLists[edge1].erase(it1);
+    }
+
+    auto it2 = std::find(adjLists[edge2].begin(), adjLists[edge2].end(), edge1);
+    if (it2 != adjLists[edge2].end()) {
+        adjLists[edge2].erase(it2);
     }
 }
+
 
 
 void Graph::mergeVertices(int vertex_to_merge, int vertex_to_delete) {
@@ -219,6 +226,9 @@ Graph* Graph::extract_neighboring_subgraph(int vertex) {
         Graph* empty_graph = new Graph(0);
         return empty_graph;
     }
+    this->adjLists.resize(this->adjLists.size()-new_graph->adjLists.size());
+    this->adjLists.shrink_to_fit();
+    this->numVertices = this->adjLists.size();
     return new_graph;
 }
 

@@ -7,9 +7,10 @@
 
 class Graph {
 private:
-    int numVertices; // Liczba wierzchołków
 
 public:
+    int numVertices; // Liczba wierzchołków
+
     // Konstruktor
     Graph(int vertices);
     

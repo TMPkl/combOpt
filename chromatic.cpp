@@ -147,7 +147,7 @@ if (graph.number_of_vertices() == 1) {
     }
     if (graph.is_tree())  //znacznie przyspiesza obliczenia
     {
-        std::cout << "Chomatic:: The graph is a tree." << std::endl;
+        std::cout << "Chomatic:: The graph is a tree. number of vertices: ";
         Chromatic_polynomial res(1);
         Chromatic_polynomial multiplyer(1);
         res.set_coefficient(1,1);
@@ -164,6 +164,12 @@ if (graph.number_of_vertices() == 1) {
         return res;
     }
 
+
+    Graph *unconnected = graph.extract_neighboring_subgraph(graph.find_max_degree_vertice());
+
+    /////tutaj sie nadal naprawia nie ruszac tego  
+
+
     Graph *deleted_edge = new Graph(graph.number_of_vertices());
     deleted_edge->adjLists = graph.adjLists;
     deleted_edge->deleteEdge(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
@@ -172,19 +178,13 @@ if (graph.number_of_vertices() == 1) {
     merged_vertices->adjLists = graph.adjLists;
     merged_vertices->mergeVertices(graph.find_max_degree_vertice(), graph.adjLists[graph.find_max_degree_vertice()][0]);
 
-
-    auto unconnected_de =deleted_edge->extract_neighboring_subgraph(graph.find_max_degree_vertice());
-    auto unconnected_mv =merged_vertices->extract_neighboring_subgraph(graph.find_max_degree_vertice());
     auto main_de = recusive_chromatic_counting(*deleted_edge);
     auto main_mv = recusive_chromatic_counting(*merged_vertices);
-    auto unconnected_de_res = recusive_chromatic_counting(*unconnected_de);
-    auto unconnected_mv_res = recusive_chromatic_counting(*unconnected_mv);
 
-
-    main_de.multiply(unconnected_de_res);
-    main_mv.multiply(unconnected_mv_res);
+    Chromatic_polynomial unconected_poly = recusive_chromatic_counting(*unconnected);
 
     main_de.subtract(main_mv);
+    main_de.multiply(unconected_poly);
 
     return main_de;
 
