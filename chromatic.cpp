@@ -116,87 +116,107 @@ int Chromatic_polynomial::check_if_possible() {
     return 1; 
 } 
 
-Chromatic_polynomial recusive_chromatic_counting(Graph graph){
-if(graph.number_of_edges() == 0 && graph.number_of_vertices() == 0)
-{
-    Chromatic_polynomial res(0);
-    res.set_coefficient(0,1);
-    return res;
-}
-if (graph.number_of_vertices() == 2 && graph.number_of_edges() == 1) {
-        Chromatic_polynomial res(2);
-        res.set_coefficient(2, 1); 
-        res.set_coefficient(1, -1); 
-        res.set_coefficient(0, 0); 
-        return res;
+Chromatic_polynomial recusive_chromatic_counting(Graph input_graph) {
+    input_graph.adjLists.shrink_to_fit();
+
+    for (int i = 0; i < input_graph.number_of_vertices(); i++) {
+        input_graph.adjLists[i].shrink_to_fit();
     }
-if (graph.number_of_vertices() == 1) {
-        Chromatic_polynomial res(1);
-        res.set_coefficient(1, 1); 
-        res.set_coefficient(0, 0); 
+    input_graph.adjLists.shrink_to_fit();
+
+    std::cerr << "Processing graph:\n";
+    input_graph.printGraph();
+
+    if (input_graph.number_of_edges() == 0 && input_graph.number_of_vertices() == 0) {
+        Chromatic_polynomial res(0);
+        res.set_coefficient(0, 1);
         return res;
     }
 
-    if (graph.number_of_edges() == 0) {
-        Chromatic_polynomial res(graph.number_of_vertices());
-        res.set_coefficient(graph.number_of_vertices(), 1);
-        for (int i = 0; i < graph.number_of_vertices(); i++) {
+    if (input_graph.number_of_vertices() == 2 && input_graph.number_of_edges() == 1) {
+        Chromatic_polynomial res(2);
+        res.set_coefficient(2, 1);
+        res.set_coefficient(1, -1);
+        res.set_coefficient(0, 0);
+        return res;
+    }
+
+    if (input_graph.number_of_vertices() == 1) {
+        Chromatic_polynomial res(1);
+        res.set_coefficient(1, 1);
+        res.set_coefficient(0, 0);
+        return res;
+    }
+
+    if (input_graph.number_of_edges() == 0) {
+        Chromatic_polynomial res(input_graph.number_of_vertices());
+        res.set_coefficient(input_graph.number_of_vertices(), 1);
+        for (int i = 0; i < input_graph.number_of_vertices(); i++) {
             res.set_coefficient(i, 0);
         }
         return res;
     }
-    if (graph.is_tree())  //znacznie przyspiesza obliczenia
-    {
-        std::cout << "Chomatic:: The graph is a tree. number of vertices: ";
+
+    if (input_graph.is_tree()) {
         Chromatic_polynomial res(1);
-        Chromatic_polynomial multiplyer(1);
-        res.set_coefficient(1,1);
-        res.set_coefficient(0,0);  
-        multiplyer.set_coefficient(1,1);
-        multiplyer.set_coefficient(0,-1);
-        std::cout<< graph.number_of_vertices() << std::endl;
-        for(int i = 0; i<graph.number_of_vertices()-1;i++)
-        {   
-            res.multiply(multiplyer);
-        
+        Chromatic_polynomial multiplier(1);
+        res.set_coefficient(1, 1);
+        res.set_coefficient(0, 0);
+        multiplier.set_coefficient(1, 1);
+        multiplier.set_coefficient(0, -1);
+
+        std::cerr << "Graph is a tree with " << input_graph.number_of_vertices() << " vertices.\n";
+
+        for (int i = 0; i < input_graph.number_of_vertices() - 1; i++) {
+            res.multiply(multiplier);
         }
 
         return res;
     }
 
-
-    Graph *unconnected = graph.extract_neighboring_subgraph(0);
-    Chromatic_polynomial unconected_poly = recusive_chromatic_counting(*unconnected);
+    // Extract unconnected subgraph
+    Graph *unconnected = input_graph.extract_neighboring_subgraph(0);
+    if (!unconnected) {
+        std::cerr << "Error: Failed to extract unconnected subgraph.\n";
+        exit(EXIT_FAILURE);
+    }
+    Chromatic_polynomial unconnected_poly = recusive_chromatic_counting(*unconnected);
     delete unconnected;
-    /////tutaj sie nadal naprawia nie ruszac tego  
-    
-    Graph *deleted_edge = new Graph(graph.number_of_vertices());
-    deleted_edge->adjLists = graph.adjLists;
-    deleted_edge->deleteEdge(deleted_edge->find_max_degree_vertice(), deleted_edge->adjLists[deleted_edge->find_max_degree_vertice()][0]);
 
-    Graph *merged_vertices = new Graph(graph.number_of_vertices());
-    merged_vertices->adjLists = graph.adjLists;
-    merged_vertices->mergeVertices(merged_vertices->find_max_degree_vertice(),merged_vertices->adjLists[merged_vertices->find_max_degree_vertice()][0]);
+    // Merge vertices
+    Graph *merged_vertices = new Graph(input_graph.number_of_vertices());
+    merged_vertices->adjLists = input_graph.adjLists;
 
-    auto main_de = recusive_chromatic_counting(*deleted_edge);
-    auto main_mv = recusive_chromatic_counting(*merged_vertices);
+    int max_degree_vertice = merged_vertices->find_max_degree_vertice();
+    if (max_degree_vertice >= 0 && !merged_vertices->adjLists[max_degree_vertice].empty()) {
+        merged_vertices->mergeVertices(max_degree_vertice, merged_vertices->adjLists[max_degree_vertice][0]);
+    } else {
+        std::cerr << "Error: Invalid vertex for merging.\n";
+        exit(EXIT_FAILURE);
+    }
 
+    // Delete edge
+    Graph *deleted_edge = new Graph(input_graph.number_of_vertices());
+    deleted_edge->adjLists = input_graph.adjLists;
+
+    if (max_degree_vertice >= 0 && !deleted_edge->adjLists[max_degree_vertice].empty()) {
+        deleted_edge->deleteEdge(max_degree_vertice, deleted_edge->adjLists[max_degree_vertice][0]);
+    } else {
+        std::cerr << "Error: Invalid edge for deletion.\n";
+        exit(EXIT_FAILURE);
+    }
+
+    // Recursive calls
+    std::cerr << "Recursively calling for deleted_edge...\n";
+    Chromatic_polynomial main_de = recusive_chromatic_counting(*deleted_edge);
+    delete deleted_edge;
+
+    std::cerr << "Recursively calling for merged_vertices...\n";
+    Chromatic_polynomial main_mv = recusive_chromatic_counting(*merged_vertices);
+    delete merged_vertices;
 
     main_de.subtract(main_mv);
-    main_de.multiply(unconected_poly);
+    main_de.multiply(unconnected_poly);
 
     return main_de;
-
-
-    //Chromatic_polynomial res1 = recusive_chromatic_counting(*deleted_edge);
-    //Chromatic_polynomial res2 = recusive_chromatic_counting(*merged_vertices);
-
-    //res1.subtract(res2);
-
-
-    //delete deleted_edge;
-  //  delete merged_vertices;
-   
-//    return res1;
-       
-    }
+}

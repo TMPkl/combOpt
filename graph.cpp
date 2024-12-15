@@ -7,7 +7,6 @@
 #include <unordered_set>
 
 class Graph {
-private:
     
 public:
     int numVertices;
@@ -96,28 +95,45 @@ void Graph::printGraph() {
 }
 void Graph::deleteEdge(int edge1, int edge2)
 {
+    if(edge1 == edge2 || !this->is_edge(edge1,edge2))
+    {
+        std::cerr<<"Deleting edge that isnt possible to exist (a = b)"<<std::endl;
+        return;
+    }
+
+
     auto it1 = std::find(adjLists[edge1].begin(), adjLists[edge1].end(), edge2);
     if (it1 != adjLists[edge1].end()) {
         adjLists[edge1].erase(it1);
+        adjLists[edge1].shrink_to_fit();
+
     }
 
     auto it2 = std::find(adjLists[edge2].begin(), adjLists[edge2].end(), edge1);
     if (it2 != adjLists[edge2].end()) {
         adjLists[edge2].erase(it2);
+        adjLists[edge2].shrink_to_fit();
     }
+    return;
 }
 
 
 
 void Graph::mergeVertices(int vertex_to_merge, int vertex_to_delete) {
-    for (int neighbor : adjLists[vertex_to_delete]) {
-        if (neighbor != vertex_to_merge) {  
+    if (vertex_to_merge >= numVertices || vertex_to_delete >= numVertices || vertex_to_merge < 0 || vertex_to_delete < 0) {
+        std::cerr << "Invalid vertex index in mergeVertices." << std::endl;
+        return;
+    }
+
+    std::vector<int> neighbors_to_process(adjLists[vertex_to_delete]);
+    for (int neighbor : neighbors_to_process) {
+        if (neighbor != vertex_to_merge) {
             if (std::find(adjLists[vertex_to_merge].begin(), adjLists[vertex_to_merge].end(), neighbor) == adjLists[vertex_to_merge].end()) {
                 adjLists[vertex_to_merge].push_back(neighbor);
             }
             for (int &n : adjLists[neighbor]) {
                 if (n == vertex_to_delete) {
-                    n = vertex_to_merge;  
+                    n = vertex_to_merge;
                 }
             }
         }
@@ -128,21 +144,17 @@ void Graph::mergeVertices(int vertex_to_merge, int vertex_to_delete) {
     }
 
     adjLists[vertex_to_delete].clear();
-
     adjLists.erase(adjLists.begin() + vertex_to_delete);
-    numVertices--;
 
-    for (int i = 0; i < numVertices; ++i) {
+    for (int i = 0; i < adjLists.size(); ++i) {
         for (int &neighbor : adjLists[i]) {
             if (neighbor > vertex_to_delete) {
-                neighbor--; 
+                neighbor--;
             }
         }
     }
-    this->adjLists.resize(this->adjLists.size()-1);
-    this->adjLists.shrink_to_fit();
-    this->numVertices = this->adjLists.size();
 
+    numVertices = adjLists.size();
     std::cout << "Vertices " << vertex_to_delete << " and " << vertex_to_merge << " merged and indices updated successfully." << std::endl;
 }
 int Graph::number_of_edges()
@@ -156,8 +168,22 @@ int Graph::number_of_edges()
 }
 
 int Graph::find_max_degree_vertice(){
+    adjLists.shrink_to_fit();
+    for(int i = 0; i < numVertices; i++)
+    {
+        adjLists[i].shrink_to_fit();
+    }
+    adjLists.shrink_to_fit();
+
     int max_degree = 0;
     int vertice = 0;
+    if (this->adjLists.size()==0)
+    {
+    std::cerr << "Error: Graph is empty." << std::endl;
+        
+    return -1;
+    }
+    
     if(numVertices == 0)
     {
         std::cerr << "Error: Graph is empty." << std::endl;
@@ -235,6 +261,7 @@ Graph* Graph::extract_neighboring_subgraph(int vertex) {
         Graph* empty_graph = new Graph(0);
         return empty_graph;
     }
+
     this->adjLists.resize(this->adjLists.size()-new_graph->adjLists.size());
     this->adjLists.shrink_to_fit();
     this->numVertices = this->adjLists.size();
